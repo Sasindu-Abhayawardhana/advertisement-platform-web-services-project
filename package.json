@@ -1,6 +1,6 @@
 {
   "name": "advertisement-platform-web-services-project",
-  "version": "2.0.2",
+  "version": "2.0.1",
   "main": "dist/main.js",
   "type": "module",
   "scripts": {

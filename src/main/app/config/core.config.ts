@@ -36,6 +36,7 @@ export function Module(controllers: Array<Function>) {
 export function RestController(path: string = "/") {
     return function (constructor: Function) {
         CONTROLLERS[constructor.name].path = path;
+        CONTROLLERS[constructor.name].constructor = constructor;
     }
 }
 
@@ -75,68 +76,66 @@ export function Middleware(middlewares: Array<RequestHandler>) {
             CONTROLLERS[target.constructor.name].handlers![name!].middlewares = middlewares;
         }
     }
-
 }
 
 // Req mapping decorator
-export function GetMapping(path: string = "/") {
-    return function (prototype: Object, name: string, descriptor: PropertyDescriptor) {
-        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {
-            handlers: {}
-        };
+export function GetMapping(path: string = "/"){
+    return function(prototype: Object, name: string, descriptor: PropertyDescriptor){
+        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {};
+        if (!CONTROLLERS[prototype.constructor.name].handlers) CONTROLLERS[prototype.constructor.name].handlers = {};
         CONTROLLERS[prototype.constructor.name].handlers![name] = {
+            name,
             path,
             method: 'GET'
         }
     }
 }
 
-export function PostMapping(path: string = "/") {
-    return function (prototype: Object, name: string, descriptor: PropertyDescriptor) {
+export function PostMapping(path: string = "/"){
+    return function(prototype: Object, name: string, descriptor: PropertyDescriptor){
 
         // check the availability of the handler object of the controller
         // then add the path and HTTP command
-        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {
-            handlers: {}
-        };
+        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {};
+        if (!CONTROLLERS[prototype.constructor.name].handlers) CONTROLLERS[prototype.constructor.name].handlers = {};
         CONTROLLERS[prototype.constructor.name].handlers![name] = {
+            name,
             path,
             method: 'POST'
         }
     }
 }
 
-export function PutMapping(path: string = "/") {
-    return function (prototype: Object, name: string, descriptor: PropertyDescriptor) {
-        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {
-            handlers: {}
-        };
+export function PutMapping(path: string = "/"){
+    return function(prototype: Object, name: string, descriptor: PropertyDescriptor){
+        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {};
+        if (!CONTROLLERS[prototype.constructor.name].handlers) CONTROLLERS[prototype.constructor.name].handlers = {};
         CONTROLLERS[prototype.constructor.name].handlers![name] = {
+            name,
             path,
             method: 'PUT'
         }
     }
 }
 
-export function DeleteMapping(path: string = "/") {
-    return function (prototype: Object, name: string, descriptor: PropertyDescriptor) {
-        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {
-            handlers: {}
-        };
-
+export function DeleteMapping(path: string = "/"){
+    return function(prototype: Object, name: string, descriptor: PropertyDescriptor){
+        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {};
+        if (!CONTROLLERS[prototype.constructor.name].handlers) CONTROLLERS[prototype.constructor.name].handlers = {};
         CONTROLLERS[prototype.constructor.name].handlers![name] = {
+            name,
             path,
             method: 'DELETE'
         }
     }
 }
 
-export function PatchMapping(path: string = "/") {
-    return function (prototype: Object, name: string, descriptor: PropertyDescriptor) {
-        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {
-            handlers: {}
-        };
+export function PatchMapping(path: string = "/"){
+    return function(prototype: Object, name: string, descriptor: PropertyDescriptor){
+        if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {};
+        if (!CONTROLLERS[prototype.constructor.name].handlers) CONTROLLERS[prototype.constructor.name].handlers = {};
         CONTROLLERS[prototype.constructor.name].handlers![name] = {
+            name,
             path,
             method: 'PATCH'
         }

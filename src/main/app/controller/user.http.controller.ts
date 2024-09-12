@@ -1,36 +1,34 @@
-import express, {json, Request, Response} from 'express';
-import {UserTo} from "../to/user.to.js";
+import {json, Request, Response} from 'express';
 import {Validators} from "../middleware/validators.middleware.js";
 import {DeleteMapping, GetMapping, Middleware, PostMapping, RestController} from "../config/core.config.js";
+import {FactoryService, ServiceType} from "../service/factory.service.js";
+import {UserService} from "../service/custom/user.service.js";
 
-@Middleware([json()]) // Apply this Json middleware to all services
+@Middleware([json()])
 @RestController("/users")
 export class UserHttpController {
 
-    @Middleware([Validators.validateUser])
-    @PostMapping("/")
+    @Middleware([json(), Validators.validateUser])
+    @PostMapping()
     async createNewUserAccount(req: Request, res: Response) {
-        const user = req.body as UserTo;
+        const userService =
+            FactoryService.getInstance().getService(ServiceType.USER) as UserService;
+        try {
+            await userService.createNewUserAccount(req.body);
+            res.sendStatus(201);
+        }catch(e){
+            console.log(e);
+            res.sendStatus(500);
+        }
     }
 
-    @DeleteMapping("/me")
+    @DeleteMapping("/:user")
     async deleteUserAccount(req: Request, res: Response) {
         console.log("Delete user account");
     }
 
-    @GetMapping("/me")
+    @GetMapping("/:user")
     async getUserAccount(req: Request, res: Response) {
         console.log("Get user account information")
     }
 }
-
-// Following parts are done by using the decorators
-/*
-const router = express.Router();
-const httpController = new UserHttpController();
-
-router.use(json());
-router.get("/me", httpController.getUserAccount);
-router.post("/", Validators.validateUser, httpController.createNewUserAccount);
-router.delete("/me", httpController.deleteUserAccount);*/
-

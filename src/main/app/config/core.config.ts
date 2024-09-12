@@ -43,7 +43,7 @@ export function RestController(path: string = "/") {
 export function Middleware(middlewares: Array<RequestHandler>) {
     return function (target: Object | Function, name?: string, descriptor?: PropertyDescriptor) {
 
- /*
+ /* NOTE
 * For class decorators : target is the class constructor function.
 * For method or property decorators : target is the prototype object of the method or property is defined.
 * name : This parameter holds the name of the property or method being decorated.
@@ -182,7 +182,7 @@ export class ExpressApp {
             }
 
             // Set the handlers
-            /*
+            /* REPLACE THIS PART USING DECORATORS
             router.get("/me", httpController.getUserAccount);
             router.post("/", Validators.validateUser, httpController.createNewUserAccount);
             router.delete("/me", httpController.deleteUserAccount);

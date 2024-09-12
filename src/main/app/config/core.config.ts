@@ -146,7 +146,7 @@ export function PatchMapping(path: string = "/") {
 // Now create a express app using the collected details through decorators
 // use CONTROLLER object to inject the details
 export class ExpressApp {
-    // THis create function call from the main.ts
+    // This create function call from the main.ts
     static create(module: Function) {
         // Create the main express app
         const app = express();

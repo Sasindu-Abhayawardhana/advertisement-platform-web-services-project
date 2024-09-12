@@ -22,6 +22,4 @@ export class Validators {
             next();
         }
     }
-
-//     meka athule thma okkoma validators danne
 }

@@ -1,13 +1,3 @@
-/*
-export class UserTo {
-    constructor(public email: string,
-                public name: string,
-                public contact: string) {
-    }
-}*/
-// constructor ekak tyeddi decorators danna ba
-// meka change krnne wenawa
-
 import {IsEmail, IsEmpty, IsNotEmpty, Matches, MinLength} from "class-validator";
 
 export class UserTo {

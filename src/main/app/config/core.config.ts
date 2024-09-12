@@ -1,92 +1,9 @@
-/*
-import express from "express";
-
-//  handler eka define karanawa
-//  handler eka mona wageda kyla
-// TS danne nane, handler eka mona wageda kyla, aluth data type ekak nisa
-// api kyla denna one me Handler and Controler kynne me wage ekak kyla
-type Handler = {
-    path?: string,
-    method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
-    middlewares?: Array<Function>
-}
-
-type Handlers = {
-    [handler: string]: Handler
-}
-
-type Controller = {
-    path?: string,
-    middlewares?: Array<Function>,
-    handlers?: Handlers
-}
-
-type Controllers = {
-    [controller: string]: Controller
-}
-
-// 1 . create object from controllers
-const CONTROLLERS: Controllers = {};
-
-export function Module(controllers: Array<Function>){
-    return function(constructor: Function){}
-}
-// decorators wada karana thathweta ganna yanne
-/!*
-me decorator register wenna one automatically registor eka athuledi
-meya hope karanawa array ekak
-
-* *!/
-
-// 1 kwru hri rest controller eka use kaloth, eyata controllers kyne eke construtcor eka set krla tynawa
-export function RestController(path: string = "/"){
-    return function(constructor: Function){
-        CONTROLLERS[constructor.name].path = path;
-        console.log("RestController");
-        console.log(CONTROLLERS);
-    }
-}
-
-export function Middleware([]: Array<Function>){
-    return function(target: Object | Function, name?: string, descriptor?: PropertyDescriptor){}
-}
-
-export function GetMapping(path: string = "/"){
-    return function(target: Object, name: string, descriptor: PropertyDescriptor){}
-}
-
-export function PostMapping(path: string = "/"){
-    return function(target: Object, name: string, descriptor: PropertyDescriptor){
-        console.log("PostMapping");
-    }
-}
-
-export function PutMapping(path: string = "/"){
-    return function(target: Object, name: string, descriptor: PropertyDescriptor){}
-}
-
-export function DeleteMapping(path: string = "/"){
-    return function(target: Object, name: string, descriptor: PropertyDescriptor){}
-}
-
-export function PatchMapping(path: string = "/"){
-    return function(target: Object, name: string, descriptor: PropertyDescriptor){}
-}
-
-// dn express app eka hadanna yanne methna hadanna yanne
-// kalin hdpu main eka wenuwata
-// main ekn meka ain krla danawa
-export class ExpressApp {
-    static create(module: Function){
-        const app = express();
-        return app;
-    }
-}*/
-
 import express, {RequestHandler} from "express";
 
+// Define types
+
 type Handler = {
-    name?: string, // handler ekata name ekak thibiya uthui
+    name?: string,
     path?: string,
     method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
     middlewares?: Array<RequestHandler>
@@ -106,42 +23,62 @@ type Controller = {
 type Controllers = {
     [controller: string]: Controller
 }
-
+// Use object to store all the data which are collected using the decorators
 const CONTROLLERS: Controllers = {};
 
+// Here define all the decorators which use to route the reqs
 export function Module(controllers: Array<Function>) {
     return function (constructor: Function) {
     }
 }
 
+// register the path for each controller
 export function RestController(path: string = "/") {
     return function (constructor: Function) {
         CONTROLLERS[constructor.name].path = path;
     }
 }
 
+// middleware decorator
 export function Middleware(middlewares: Array<RequestHandler>) {
     return function (target: Object | Function, name?: string, descriptor?: PropertyDescriptor) {
 
-//     middle ware eka class ekata dannth puluwn method ekata dnnth puluwn
-//     eka identify kara ganna use krnne puluwn apita
+ /*
+* For class decorators : target is the class constructor function.
+* For method or property decorators : target is the prototype object of the method or property is defined.
+* name : This parameter holds the name of the property or method being decorated.
+* descriptor : object that provides detailed information about the property or method being decorated.
+* */
+
+        // if the name and descriptor is undefined that means its class decorator
         if (!name && !descriptor) {
             // Class
+            // if the controller isn't already added to the controller object then add it
             if (!CONTROLLERS[(target as Function).name]) CONTROLLERS[(target as Function).name] = {};
+            // then set the middleware which pass with the decorator
             CONTROLLERS[(target as Function).name].middlewares = middlewares;
         } else {
             // Method
+            // if a method is adding as a middleware
+            // target.constructor.name = prototype object.constructor.name
+            // first check the availability of the controller
+            // second check the availability of the handler object of the controller
+            // third check the availability of the decorated handler ( like createNewUserAccount)
+
             if (!CONTROLLERS[target.constructor.name]) CONTROLLERS[target.constructor.name] = {};
             if (!CONTROLLERS[target.constructor.name].handlers) CONTROLLERS[target.constructor.name].handlers = {};
             if (!CONTROLLERS[target.constructor.name].handlers![name!]) CONTROLLERS[target.constructor.name].handlers![name!] = {
                 name
             };
+
+            // Finally add the middleware to handler object
             CONTROLLERS[target.constructor.name].handlers![name!].middlewares = middlewares;
         }
     }
 
 }
 
+// Req mapping decorator
 export function GetMapping(path: string = "/") {
     return function (prototype: Object, name: string, descriptor: PropertyDescriptor) {
         if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {
@@ -156,6 +93,9 @@ export function GetMapping(path: string = "/") {
 
 export function PostMapping(path: string = "/") {
     return function (prototype: Object, name: string, descriptor: PropertyDescriptor) {
+
+        // check the availability of the handler object of the controller
+        // then add the path and HTTP command
         if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {
             handlers: {}
         };
@@ -183,6 +123,7 @@ export function DeleteMapping(path: string = "/") {
         if (!CONTROLLERS[prototype.constructor.name]) CONTROLLERS[prototype.constructor.name] = {
             handlers: {}
         };
+
         CONTROLLERS[prototype.constructor.name].handlers![name] = {
             path,
             method: 'DELETE'
@@ -202,91 +143,63 @@ export function PatchMapping(path: string = "/") {
     }
 }
 
-// express app ekak hadanna kynawa
+// Now create a express app using the collected details through decorators
+// use CONTROLLER object to inject the details
+
 export class ExpressApp {
     static create(module: Function) {
-        const app = express(); // aluth app ekak hadanawa => e app eka return krnawa
-        // e app eka return krnne kalin, loku controller object eka return krnne kynawa
+        // Create the main express app
+        const app = express();
+
         console.log(CONTROLLERS);
         console.log('===================')
         console.log(CONTROLLERS['UserHttpController']);
         console.log('===================')
         console.log(CONTROLLERS['AdvertisementHttpController']);
 
-        ///
-        // iterate kranne controoler object eka
-        // key wadk na values one Key: value
-        // controllers deka enawa values vidiyata
+        // Iterate through the CONTROLLER to get the controller
+
         for (const controllerObj of Object.values(CONTROLLERS)) {
             // construtor nthn wadk wenne na, next ekata ynawa
             // knk copntroller hadala, reset controller eka dala na
             // @RestController("/users") tynna one
             // ehma unoth eya controller knk kyla salakan na
 
-            if (!controllerObj.constructor) continue;  // << IMP
-            const router = express.Router(); // hama controller ekatma router eka gane hadanna
-            // express kynawa router ekak hadala denna kyla
+            // Here need to have a controller constructor
+            // need to set the path through @RestController("/users") decorator
+            // if the route path is not set then skip those controllers
+            if (!controllerObj.constructor) continue;
 
-            // dn meka thama ain krnne yanne api
-            /*
-            * * const router = express.Router();
-            const httpController = new UserHttpController();
+            // create a separate route for each controller
+            const router = express.Router();
 
-            router.use(json());
-            router.get("/me", httpController.getUserAccount);
-            router.post("/", Validators.validateUser, httpController.createNewUserAccount);
-            router.delete("/me", httpController.deleteUserAccount);
-* */
-
-            // eyage construtor eka run krla, controller eka hada gannawa
-            // construtor tynawa nm, eyage object ekak hada gannawa
-            // router ekak one object ekak one
-            // ethkota ara line deka in wenawa
-            /*
-            * const router = express.Router();
-              const httpController = new UserHttpController();
-              *
-            * */
-
+            // Tell explicitly to treat as constructor function to use new keyword and create new instance
             const controller = new (controllerObj.constructor as (new () => any))();
-            // class ekak vydta penunta fn ekak vdyta balanna
-            // fn ekakata new eka danna den na - not sure
 
-            // dn middelware tika set krnne one
-            /*
-            router.use(json()); - JSON eka set kala
-            * */
-
-            // router ekata middle ware eka set krnne
-            // class ekata set krla tyne middlewares tika set wenna one router ekata
+            //iterate through middleware
             for (const middleware of controllerObj.middlewares!) {
                 router.use(middleware);
-
             }
 
-            // dn handler tika set krnne puluwn
+            // Set the handlers
             /*
             router.get("/me", httpController.getUserAccount);
             router.post("/", Validators.validateUser, httpController.createNewUserAccount);
             router.delete("/me", httpController.deleteUserAccount);
             * */
             for (const handler of Object.values(controllerObj.handlers!)) {
-                // handlers tika iterate krnawa
+                // Iterate handlers
                 switch (handler.method) {
-                    // mapping eka anuwa register krnne one
-                    //     handler eke tyna medthod eka balanna
+                    // according to the http command map the handler
                     case "GET":
                         if (handler.middlewares) {
+                            // path, middlewares, handler
                             router.get(handler.path!, [...handler.middlewares, controller[handler.name!]]);
                         } else {
                             router.get(handler.path!, controller[handler.name!]);
                         }
                         break;
                     case "POST":
-                        /*
-                        check middle ware => post ekak danna
-                        not => handler ekak danna
-                        * */
                         if (handler.middlewares) {
                             router.post(handler.path!, [...handler.middlewares, controller[handler.name!]]);
                         } else {
@@ -316,13 +229,10 @@ export class ExpressApp {
                         break;
                 }
             }
-
-            // app ekata router eka set karanawa
+            // Pass the main app path and router object
             app.use(controllerObj.path!, router);
         }
-
         return app;
     }
 }
 
-//dn apita one nm meka, node eke install krla, node package ekak vdyta use krnne puluwn

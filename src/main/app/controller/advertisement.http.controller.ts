@@ -21,16 +21,15 @@ export class AdvertisementHttpController {
     }
 }
 
-const router = express.Router();
+// Following parts are done by using the decorators
+/*const router = express.Router();
 const httpController = new AdvertisementHttpController();
 
 router.get('/', httpController.getAllAdvertisements);
 router.post('/', httpController.postAdvertisement);
-router.delete('/:id', httpController.deleteAdvertisement);
+router.delete('/:id', httpController.deleteAdvertisement);*/
 
-// export {router as AdvertisementHttpController};
-// yatama tyne export eka ain karala uda class eka export karanna
-// classes deka ethkota, wena modules waladi import kara ganna puluwn
+
 
 
 

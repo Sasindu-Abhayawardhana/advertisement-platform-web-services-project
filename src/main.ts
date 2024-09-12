@@ -1,20 +1,22 @@
-import express from 'express';
-import {controller as AdvertisementController} from "./controller/advertisement.http.controller.js";
-import {controller as UserController} from './controller/user.http.controller.js';
-import {ping as pingToDatabase} from "./database/pool.database.js";
 
-console.log("Trying to connect with the database server");
+import {ExpressApp} from "./main/app/config/core.config.js";
+import {AppModule} from "./main/app/app.module.js";
 
-await pingToDatabase();
-console.log("Connected to the database server - OK")
+// Add layered architecture to the project
+/*
+* Revamp the folder structure according to the layered architecture
+* Add controllers into controller layer
+* Add middlewares into separate layer
+* add repository layer (DAO)
+* add service layer (Business)
+* */
 
-// create a express app
-const app = express();
 
-app.use('/advertisements', AdvertisementController);
-app.use('/users', UserController);
+function bootstrap(){
+    const app = ExpressApp.create(AppModule);
+    app.listen(5050, ()=>{
+        console.log("Server is listening at 5050");
+    });
+}
 
-// open a server port and listening
-app.listen(5050, () => {
-    console.log("Server is listening at 5050");
-});
+bootstrap();

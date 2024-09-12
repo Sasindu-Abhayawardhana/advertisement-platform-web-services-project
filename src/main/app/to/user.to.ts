@@ -1,5 +1,6 @@
-import {IsEmail, IsEmpty, IsNotEmpty, Matches, MinLength} from "class-validator";
+import {IsEmail, IsNotEmpty, Matches, MinLength} from "class-validator";
 
+// add class validator decorators to validate the field
 export class UserTo {
     @IsEmail()
     @IsNotEmpty()
@@ -10,6 +11,6 @@ export class UserTo {
     name!: string;
 
     @IsNotEmpty()
-    @Matches(/^0\d{2}-\d{7}$/)
+    @Matches(/^0\d{2}-\d{7}$/) // 011-1234567
     contact!: string;
 }
